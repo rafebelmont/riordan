@@ -1,0 +1,5 @@
+discord.py==2.5.2
+Pillow==11.2.1
+selenium==4.32.0
+thefuzz==0.22.1
+dotenv==0.9.9
