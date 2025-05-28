@@ -37,12 +37,17 @@ async def getCard(interaction: discord.Interaction, search_name: str, regenerate
     file_name_str = bot_functions.give_card(search_name, regenerate)
     await interaction.followup.send(file=discord.File(file_name_str))
 
-@client.tree.command(name="build_warband", description="Cria um warband. Use ',' como separador", guild=GUILD)
+@client.tree.command(name="build_warband", description="Cria um warband. Use ';' como separador", guild=GUILD)
 async def buildWarband(interaction: discord.Interaction, *, warband: str):
     await interaction.response.defer()
-    args_list = warband.split(",")
+    args_list = warband.split(";")
     warband_str, total_points, total_hp, warband_jpg = bot_functions.give_warband(*args_list)
     await interaction.followup.send(warband_str+f', Total de pontos: {total_points}, Total de HP: {total_hp}.')
     await interaction.followup.send(file=discord.File(warband_jpg))
+
+@client.tree.command(name="add_alias", description="Adiciona um alias (apelido) a uma criatura.", guild=GUILD)
+async def addAlias(interaction: discord.Interaction, alias: str, search_name: str):
+    the_card_name = bot_functions.add_alias(alias, search_name)
+    await interaction.response.send_message(f'O apelido {alias} foi adicionado a criatura {the_card_name}.')
 
 client.run(TOKEN)

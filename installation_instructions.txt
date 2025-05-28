@@ -1,0 +1,14 @@
+# set up virtual environment
+sudo apt install python3-venv
+python3 -m venv .venv
+source .venv/bin/activate
+
+# install python packages
+pip install -r requirements.txt
+
+# run the bot
+python3 riordan_main.py
+
+#Note: Currently, one might need to delete Firefox because the geckodriver installation might be using snap and the firefox one
+# is using the apt one. In this case, run (Selenium will provide a Firefox binary if it does not find one)
+sudo apt remove firefox

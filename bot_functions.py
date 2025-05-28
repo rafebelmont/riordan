@@ -41,11 +41,23 @@ def give_browser():
         browser = BotBrowser.instances[0]
         return browser
 
+def get_card_name(search_name: str):
+    #check for aliases
+    with open("aliases.json") as file:
+        aliases = json.load(file)
+    possible_alias, score = process.extractOne(search_name, aliases.keys())
+    alias = possible_alias if score == 100 else None
+    if alias != None:
+        the_card_name = process.extractOne(aliases[alias], arr_min_names)[0]
+    else:
+        the_card_name = process.extractOne(search_name, arr_min_names)[0]
+    return the_card_name
+
 def get_card(search_name_arg: str, regenerate=False):
     
     #get closest match to search_name_arg
     search_name = search_name_arg
-    the_card_name = process.extractOne(search_name, arr_min_names)[0]
+    the_card_name = get_card_name(search_name)
     
 
     #check if card jpg is already downloaded
@@ -72,7 +84,7 @@ def get_card(search_name_arg: str, regenerate=False):
         for card in cards:
             card_title = card.find_element(By.CSS_SELECTOR,'b')
             card_titles.append(card_title)
-        the_card_name = process.extractOne(search_name, [card_title.text for card_title in card_titles])[0]
+        #the_card_name = process.extractOne(search_name, [card_title.text for card_title in card_titles])[0]
 
     # selecting the correct card. Note that we check for 'epicness'
         for card in cards:
@@ -204,7 +216,7 @@ def build_warband(*args):
     dict = {}
     counter=1
     for arg in args:
-        the_card_name = process.extractOne(arg, arr_min_names)[0]
+        the_card_name = get_card_name(arg)
         points = get_card_stat(the_card_name, "points")
         hp = get_card_stat(the_card_name, "HP")
         total_points = total_points + points
@@ -276,7 +288,17 @@ def give_warband (*args):
         creature_jpg = value[0]+'.jpg'
         warband_list.append(creature_string)
         jpg_list.append(creature_jpg)
-    delimiter = ', '
-    warband_string = delimiter.join(warband_list)
+    separator = ', '
+    warband_string = separator.join(warband_list)
     warband_jpg = concat_cards(jpg_list)
     return warband_string, total_points, total_hp, warband_jpg
+
+def add_alias(alias: str, search_name):
+    the_card_name = process.extractOne(search_name, arr_min_names)[0]
+    with open("aliases.json") as file:
+        aliases = json.load(file)
+    entry = {alias: the_card_name}
+    aliases.update(entry)
+    with open('aliases.json', 'w') as file:
+        json.dump(aliases,file)
+    return the_card_name
