@@ -302,3 +302,19 @@ def add_alias(alias: str, search_name):
     with open('aliases.json', 'w') as file:
         json.dump(aliases,file)
     return the_card_name
+
+def remove_alias(alias: str):
+    with open("aliases.json") as file:
+        aliases = json.load(file)
+    try:
+        del aliases[alias]
+        with open('aliases.json', 'w') as file:
+            json.dump(aliases,file)
+        return True
+    except:
+        return False
+    
+def show_aliases():
+    with open("aliases.json") as file:
+        aliases = json.load(file)
+    return aliases

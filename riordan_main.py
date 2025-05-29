@@ -46,8 +46,30 @@ async def buildWarband(interaction: discord.Interaction, *, warband: str):
     await interaction.followup.send(file=discord.File(warband_jpg))
 
 @client.tree.command(name="add_alias", description="Adiciona um alias (apelido) a uma criatura.", guild=GUILD)
+@app_commands.checks.has_permissions(administrator = True)
 async def addAlias(interaction: discord.Interaction, alias: str, search_name: str):
     the_card_name = bot_functions.add_alias(alias, search_name)
     await interaction.response.send_message(f'O apelido {alias} foi adicionado a criatura {the_card_name}.')
+@addAlias.error
+async def on_addAlias_error(interaction: discord.Interaction, error: app_commands.errors.MissingPermissions):
+    await interaction.response.send_message("Você não tem as permissões necessárias para usar este comando.")
+
+@client.tree.command(name="remove_alias", description="Remove um alias (apelido) a uma criatura.", guild=GUILD)
+@app_commands.checks.has_permissions(administrator = True)
+async def removeAlias(interaction: discord.Interaction, alias: str):
+    success = bot_functions.remove_alias(alias)
+    if success == True:
+        await interaction.response.send_message(f'O apelido {alias} foi removido.')
+    else:
+        await interaction.response.send_message(f'Apelido inexistente.')
+@removeAlias.error
+async def on_removeAlias_error(interaction: discord.Interaction, error: app_commands.errors.MissingPermissions):
+    await interaction.response.send_message("Você não tem as permissões necessárias para usar este comando.")
+
+
+@client.tree.command(name="show_aliases", description="Mostra todos os apelidos atualmente em uso.", guild=GUILD)
+async def showAlias(interaction: discord.Interaction):
+    aliases = bot_functions.show_aliases()
+    await interaction.response.send_message(aliases)
 
 client.run(TOKEN)
