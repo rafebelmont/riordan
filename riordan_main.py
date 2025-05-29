@@ -70,6 +70,8 @@ async def on_removeAlias_error(interaction: discord.Interaction, error: app_comm
 @client.tree.command(name="show_aliases", description="Mostra todos os apelidos atualmente em uso.", guild=GUILD)
 async def showAlias(interaction: discord.Interaction):
     aliases = bot_functions.show_aliases()
-    await interaction.response.send_message(aliases)
+    aliases_string = '\n'.join(f'{key}: {value}' for key, value in aliases.items())
+    box = "```"+aliases_string+"```"
+    await interaction.response.send_message(box)
 
 client.run(TOKEN)
