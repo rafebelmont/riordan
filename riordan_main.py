@@ -41,7 +41,7 @@ async def getCard(interaction: discord.Interaction, search_name: str, regenerate
 async def buildWarband(interaction: discord.Interaction, *, warband: str):
     await interaction.response.defer()
     args_list = warband.split(";")
-    warband_str, total_points, total_hp, warband_jpg = bot_functions.give_warband(*args_list)
+    warband_str, total_points, total_hp, warband_jpg = bot_functions.give_build_warband(*args_list)
     await interaction.followup.send(warband_str+f', Total de pontos: {total_points}, Total de HP: {total_hp}.')
     await interaction.followup.send(file=discord.File(warband_jpg))
 
@@ -66,12 +66,20 @@ async def removeAlias(interaction: discord.Interaction, alias: str):
 async def on_removeAlias_error(interaction: discord.Interaction, error: app_commands.errors.MissingPermissions):
     await interaction.response.send_message("Você não tem as permissões necessárias para usar este comando.")
 
-
 @client.tree.command(name="show_aliases", description="Mostra todos os apelidos atualmente em uso.", guild=GUILD)
 async def showAlias(interaction: discord.Interaction):
     aliases = bot_functions.show_aliases()
     aliases_string = '\n'.join(f'{key}: {value}' for key, value in aliases.items())
     box = "```"+aliases_string+"```"
     await interaction.response.send_message(box)
+
+@client.tree.command(name="save_warband", description='asdsa', guild=GUILD)
+async def saveWarband(interaction: discord.Interaction, warband_name: str, *, warband: str):
+    args_list = warband.split(";")
+    warband_list = bot_functions.get_warband(*args_list)
+    user_id = interaction.user.id
+    id = interaction.guild_id
+    bot_functions.save_warband(id, user_id, warband_name, warband_list)
+    await interaction.response.send_message(f'O warband `{warband_name}` foi salvo com sucesso.')
 
 client.run(TOKEN)

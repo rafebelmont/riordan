@@ -16,6 +16,7 @@ from PIL import Image
 from min_names import *
 
 cards_folder_prefix = 'cards/' 
+warbands_folder_prefix = 'warbands/'
 website = 'https://ddmwarbands.altervista.org/'
 valid_stats = {"points", "epic-points", "faction", "level", "speed", "AC", "HP", "epic-level", "epic-speed", "epic-AC", "epic-HP"}
 factions_list ={"CG", "LG/CG", "LG", "LG/LE", "LE", "CG/CE", "CE", "LE/CE", "Any"}
@@ -279,7 +280,15 @@ def give_card(search_name: str, regenerate = False):
     file_name = get_card(search_name, regenerate)
     return file_name
 
-def give_warband (*args):
+def get_warband(*args):
+    warband = []
+    for arg in args:
+        the_card_name = get_card_name(arg)
+        warband_entry = the_card_name
+        warband.append(warband_entry)
+    return warband
+
+def give_build_warband(*args):
     warband, total_points, total_hp = build_warband(*args)
     warband_list = []
     jpg_list = []
@@ -292,6 +301,12 @@ def give_warband (*args):
     warband_string = separator.join(warband_list)
     warband_jpg = concat_cards(jpg_list)
     return warband_string, total_points, total_hp, warband_jpg
+
+def give_warband(*args):
+    warband_list = get_warband(*args)
+    separator =', '
+    warband_string = separator.join(warband_list)
+    return warband_string
 
 def add_alias(alias: str, search_name):
     the_card_name = process.extractOne(search_name, arr_min_names)[0]
@@ -318,3 +333,32 @@ def show_aliases():
     with open("aliases.json") as file:
         aliases = json.load(file)
     return aliases
+
+def save_warband(guild_id: int, user_id: int, warband_name: str, warband_list): #warband_list must be the output of get_warband function
+    guild_id_str = str(guild_id)
+    user_id_str = str(user_id)
+    with open(warbands_folder_prefix+guild_id_str+'.json', 'r') as file:
+        try:
+            warbands = json.load(file)
+        except:
+            warbands = {}
+        try:
+            warbands[user_id_str][warband_name] = warband_list
+        except KeyError:
+            warbands[user_id_str] = {}
+            warbands[user_id_str][warband_name] = warband_list
+    with open(warbands_folder_prefix+guild_id_str+'.json', 'w') as file:
+        json.dump(warbands, file)
+
+def remove_warband(guild_id: str, username: str, warband_name: str):
+    with open(warbands_folder_prefix+guild_id+'.json', 'r') as file:
+        try:
+            warbands = json.load(file)
+        except:
+            warbands = {}
+        try:
+            del warbands[username][warband_name]
+        except KeyError:
+            print('Warband does not exist.')
+    with open(warbands_folder_prefix+guild_id+'.json', 'w') as file:
+        json.dump(warbands, file)
