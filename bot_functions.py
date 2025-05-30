@@ -350,15 +350,35 @@ def save_warband(guild_id: int, user_id: int, warband_name: str, warband_list): 
     with open(warbands_folder_prefix+guild_id_str+'.json', 'w') as file:
         json.dump(warbands, file)
 
-def remove_warband(guild_id: str, username: str, warband_name: str):
-    with open(warbands_folder_prefix+guild_id+'.json', 'r') as file:
+def remove_warband(guild_id: int, user_id: int, warband_name: str):
+    guild_id_str = str(guild_id)
+    user_id_str = str(user_id)
+    with open(warbands_folder_prefix+guild_id_str+'.json', 'r') as file:
         try:
             warbands = json.load(file)
         except:
             warbands = {}
         try:
-            del warbands[username][warband_name]
+            del warbands[user_id_str][warband_name]
         except KeyError:
             print('Warband does not exist.')
-    with open(warbands_folder_prefix+guild_id+'.json', 'w') as file:
+    with open(warbands_folder_prefix+guild_id_str+'.json', 'w') as file:
         json.dump(warbands, file)
+
+def show_warbands(guild_id: int, user_id: int):
+    guild_id_str = str(guild_id)
+    user_id_str = str(user_id)
+    with open(warbands_folder_prefix+guild_id_str+'.json', 'r') as file:
+        warbands = json.load(file)
+        try:
+            return warbands[user_id_str]
+        except KeyError:
+            print(f'O usuário com id={user_id} não possui warbands salvos.')
+
+def give_warband_name(guild_id: int, user_id: int, search_name: str):
+    guild_id_str = str(guild_id)
+    user_id_str = str(user_id)
+    with open(warbands_folder_prefix+guild_id_str+'.json', 'r') as file:
+        warbands = json.load(file)
+    warband_name = process.extractOne(search_name, warbands[user_id_str].keys())[0]
+    return warband_name

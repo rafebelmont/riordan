@@ -66,14 +66,14 @@ async def removeAlias(interaction: discord.Interaction, alias: str):
 async def on_removeAlias_error(interaction: discord.Interaction, error: app_commands.errors.MissingPermissions):
     await interaction.response.send_message("Você não tem as permissões necessárias para usar este comando.")
 
-@client.tree.command(name="show_aliases", description="Mostra todos os apelidos atualmente em uso.", guild=GUILD)
+@client.tree.command(name="show_aliases", description="Mostra todos os apelidos em uso.", guild=GUILD)
 async def showAlias(interaction: discord.Interaction):
     aliases = bot_functions.show_aliases()
     aliases_string = '\n'.join(f'{key}: {value}' for key, value in aliases.items())
     box = "```"+aliases_string+"```"
     await interaction.response.send_message(box)
 
-@client.tree.command(name="save_warband", description='asdsa', guild=GUILD)
+@client.tree.command(name="save_warband", description='Salva o warband do usuário com nome warband_name.', guild=GUILD)
 async def saveWarband(interaction: discord.Interaction, warband_name: str, *, warband: str):
     args_list = warband.split(";")
     warband_list = bot_functions.get_warband(*args_list)
@@ -81,5 +81,38 @@ async def saveWarband(interaction: discord.Interaction, warband_name: str, *, wa
     id = interaction.guild_id
     bot_functions.save_warband(id, user_id, warband_name, warband_list)
     await interaction.response.send_message(f'O warband `{warband_name}` foi salvo com sucesso.')
+
+@client.tree.command(name="remove_warband", description='Remove o warband salvo do usuário.', guild=GUILD)
+async def removeWarband(interaction: discord.Interaction, warband_name: str):
+    user_id = interaction.user.id
+    id = interaction.guild_id
+    bot_functions.remove_warband(id, user_id, warband_name)
+    await interaction.response.send_message(f'O warband `{warband_name}` foi removido com sucesso.')
+
+@client.tree.command(name="show_warbands", description='Mostra os warbands salvos do usuário.', guild=GUILD)
+async def showWarbands(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    id = interaction.guild_id
+    username = interaction.user.display_name
+    user_warbands = bot_functions.show_warbands(id, user_id)
+    #warbands_string = '\n'.join(f'{key}: {value}' for key, value in user_warbands.items())
+    embed = discord.Embed(title = f"Warbands de {username}")
+    for key in user_warbands.keys():
+        warband_string = '\n'.join(user_warbands[key])
+        embed.add_field(name = key, value = warband_string)
+    await interaction.response.send_message(embed = embed)
+
+@client.tree.command(name="show_warband", description='Mostra o warband do usuário.', guild=GUILD)
+async def showWarband(interaction: discord.Interaction, warband_name: str):
+    user_id = interaction.user.id
+    id = interaction.guild_id
+    username = interaction.user.display_name
+    user_warbands = bot_functions.show_warbands(id, user_id)
+    actual_warband_name = bot_functions.give_warband_name(id, user_id, warband_name)
+    warband = user_warbands[actual_warband_name]
+    await interaction.response.defer()
+    warband_str, total_points, total_hp, warband_jpg = bot_functions.give_build_warband(*warband)
+    await interaction.followup.send(warband_str+f', Total de pontos: {total_points}, Total de HP: {total_hp}.')
+    await interaction.followup.send(file=discord.File(warband_jpg))
 
 client.run(TOKEN)
