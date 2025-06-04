@@ -339,11 +339,12 @@ def show_aliases():
                 display_aliases[value].append(key)
             except KeyError:
                 display_aliases[value] = [key]
+    sorted_display_aliases = dict(sorted(display_aliases.items()))
     display_str = ''
-    for key, value in display_aliases.items():
+    for key, value in sorted_display_aliases.items():
         value_str = "; ".join(value)
         display_str = display_str + f'{key}: {value_str}\n'
-    return display_aliases, display_str
+    return sorted_display_aliases, display_str
 
 def save_warband(guild_id: int, user_id: int, warband_name: str, warband_list): #warband_list must be the output of get_warband function
     guild_id_str = str(guild_id)
