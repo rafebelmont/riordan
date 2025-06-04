@@ -3,3 +3,4 @@ __pycache__/
 old data/
 tmp/warband.jpg
 .venv/
+aliases.json
